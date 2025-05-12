@@ -8,7 +8,7 @@ const authRoutes = require("./routes/auth");
 const chatRoutes = require("./routes/chat");
 const authMiddleware = require("./middleware/auth");
 const { connectRedis, disconnectRedis } = require("./config/redis");
-
+const path=require('path')
 const app = express();
 
 connectDB();
@@ -17,16 +17,14 @@ connectRedis();
 app.use(cors());
 app.use(express.json());
 
-app.use(express.static(Path2D.join(__dirname, 'build')))
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/chat", authMiddleware, chatRoutes);
+app.use(errorHandler);
+app.use(express.static(path.join(__dirname, 'build')))
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, 'build', "index.html"))
 })
-
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/chat", authMiddleware, chatRoutes);
-app.use(errorHandler);
-
 const server = app.listen(config.port, () => {
   console.log(`Server is running on port ${config.port}`);
 });

@@ -24,20 +24,22 @@ const Chat = () => {
     fetchHistory();
   }, [pageNum]);
 
-  const fetchChatById = async (chatId) => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}/chat/${chatId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log(data.messages);
-      setChat(data.messages);
-    } catch (err) {
-      console.error("Error fetching selected chat:", err);
-    }
-  };
+const fetchChatById = async (chatId) => {
+  try {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_ENDPOINT}/chat/${chatId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    console.log(data.messages);
+    setChat(Array.isArray(data.messages) ? data.messages : []);
+  } catch (err) {
+    console.error("Error fetching selected chat:", err);
+    setChat([]); // fallback in case of error
+  }
+};
+
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -182,7 +184,7 @@ const Chat = () => {
             </div>
           </div>
           <div className="space-y-2">
-            {history.length > 0 ? (
+            {history?.length > 0 ? (
               history.map((chatItem, idx) => (
                 <div className="flex justify-between bg-gray-700/30 hover:bg-gray-700/50 cursor-pointer transition duration-200 rounded-lg ">
                   <div
@@ -243,7 +245,7 @@ const Chat = () => {
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 mt-4">
           <div className="max-w-[50%] mx-auto w-full">
-            {chat.map((msg, idx) => (
+            {chat?.map((msg, idx) => (
               <div
                 key={idx}
                 className={`flex ${
